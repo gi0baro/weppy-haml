@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+    weppy_haml.hamlpy
+    -----------------
+
+    Adapted from the original code (https://github.com/jessemiller/HamlPy)
+
+    :copyright: (c) 2011 Jesse Miller
+    :license: BSD, see LICENSE for more details.
+"""
+
 from .nodes import RootNode, HamlNode, create_node
 
 VALID_EXTENSIONS = ['haml', 'hamlpy']

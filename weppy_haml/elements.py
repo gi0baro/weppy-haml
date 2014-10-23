@@ -1,3 +1,18 @@
+# -*- coding: utf-8 -*-
+"""
+    weppy_haml.elements
+    -------------------
+
+    Processes haml/html elements
+
+    :copyright: (c) 2014 by Giovanni Barillari
+
+    Based on the code of hamlpy (https://github.com/jessemiller/HamlPy)
+    :copyright: (c) 2011 Jesse Miller
+
+    :license: BSD, see LICENSE for more details.
+"""
+
 import re
 from types import NoneType
 
@@ -111,7 +126,6 @@ class Element(object):
             attribute_dict_string = attribute_dict_string.replace('\n', ' ')
             try:
                 # converting all allowed attributes to python dictionary style
-
                 # Replace Ruby-style HAML with Python style
                 attribute_dict_string = re.sub(self.RUBY_HAML_REGEX, '"\g<key>":', attribute_dict_string)
                 # Put double quotes around key

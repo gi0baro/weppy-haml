@@ -1,4 +1,13 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
+"""
+    weppy_haml.ext
+    --------------
+
+    Provides the Haml extension for weppy
+
+    :copyright: (c) 2014 by Giovanni Barillari
+    :license: BSD, see LICENSE for more details.
+"""
 
 import os
 import codecs
