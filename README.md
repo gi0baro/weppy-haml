@@ -28,7 +28,7 @@ So, how an haml template will look like? Let's say you have this html template i
 </div>
 ``` 
 
-Then the same template with haml syntax will be like this:
+Then the same template in haml syntax will be like this:
 
 ```haml
 - extend 'layout.html'
@@ -41,7 +41,7 @@ Then the same template with haml syntax will be like this:
                 %img.post-image{src: '{{=post.image}}'}
             %h3.post-title
                 = post.title
-            %h5.post-description
+            %h5
                 = post.description
 ``` 
 
@@ -49,7 +49,7 @@ Here is a short list of weppy-Haml pros vs the default html templating system:
 
 * Less code to write
 * Your code will be more human readable
-* You don't have to write the `pass` instructions
+* You don't have to write the `pass` instructions, just to correctly indent your code
 
 So, you still gonna use html? :)
 
@@ -94,7 +94,7 @@ def myfunction():
 weppy will look at the haml file (in this case *myfunction.haml*) insted of the html one.
 
 > **Warning**   
-> When you set configuration values for the extension, ensure to that **before** adding the extension to your application.
+> When you set configuration values for the extension, ensure to do that **before** adding the extension to your application.
 
 ### Auto reloading haml templates
 
