@@ -2,6 +2,8 @@
 
 weppy-Haml is an extension for [weppy framework](http://weppy.org) providing a Haml like syntax for templates. This is not a template engine but a compiler which converts haml files to html weppy templates.
 
+[![pip version](https://img.shields.io/pypi/v/weppy-haml.svg?style=flat)](https://pypi.python.org/pypi/weppy-Haml) 
+
 ## Haml-like syntax
 
 So, how an haml template will look like? Let's say you have this html template in your application:
