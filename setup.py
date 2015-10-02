@@ -19,7 +19,9 @@ setup(
     description='Haml syntax for weppy templates',
     long_description=__doc__,
     packages=['weppy_haml'],
-    install_requires=['weppy'],
+    install_requires=[
+        'weppy>=0.5'
+    ],
     zip_safe=False,
     platforms='any',
     classifiers=[
