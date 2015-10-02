@@ -5,7 +5,7 @@
 
     Processes haml/html elements
 
-    :copyright: (c) 2014 by Giovanni Barillari
+    :copyright: (c) 2015 by Giovanni Barillari
 
     Based on the code of hamlpy (https://github.com/jessemiller/HamlPy)
     :copyright: (c) 2011 Jesse Miller
@@ -14,7 +14,11 @@
 """
 
 import re
-from types import NoneType
+from weppy._compat import PY2, to_unicode
+if PY2:
+    from types import NoneType
+else:
+    NoneType = type(None)
 
 
 class Element(object):
@@ -140,7 +144,7 @@ class Element(object):
                             self.attributes += "%s=%s " % (k, self.attr_wrap(v))
                         else:
                             attributes_dict[k] = v
-                            v = v.decode('utf-8')
+                            v = to_unicode(v)
                             self.attributes += "%s=%s " % (k, self.attr_wrap(self._escape_attribute_quotes(v)))
                 self.attributes = self.attributes.strip()
             except:

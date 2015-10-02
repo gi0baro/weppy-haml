@@ -5,7 +5,7 @@
 
     Processes haml files and creates nodes
 
-    :copyright: (c) 2014 by Giovanni Barillari
+    :copyright: (c) 2015 by Giovanni Barillari
 
     Based on the code of hamlpy (https://github.com/jessemiller/HamlPy)
     :copyright: (c) 2011 Jesse Miller

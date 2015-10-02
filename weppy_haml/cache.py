@@ -1,8 +1,21 @@
-from weppy._compat import hashlib_md5
+# -*- coding: utf-8 -*-
+"""
+    weppy_haml.cache
+    ----------------
+
+    Cache for Haml templates
+
+    :copyright: (c) 2015 by Giovanni Barillari
+    :license: BSD, see LICENSE for more details.
+"""
+
+from weppy._compat import PY2, hashlib_md5, to_bytes
 
 
 def make_md5(value):
-    return hashlib_md5(value.encode('utf8')).hexdigest()[:8]
+    if PY2:
+        value = to_bytes(value)
+    return hashlib_md5(value).hexdigest()[:8]
 
 
 class HamlCache(object):
