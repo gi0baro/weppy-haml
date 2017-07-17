@@ -5,7 +5,7 @@
 
     Processes haml/html elements
 
-    :copyright: (c) 2015 by Giovanni Barillari
+    :copyright: (c) 2017 by Giovanni Barillari
 
     Based on the code of hamlpy (https://github.com/jessemiller/HamlPy)
     :copyright: (c) 2011 Jesse Miller
@@ -15,6 +15,7 @@
 
 import re
 from weppy._compat import PY2, to_unicode
+
 if PY2:
     from types import NoneType
 else:
@@ -22,9 +23,8 @@ else:
 
 
 class Element(object):
-    """contains the pieces of an element and can populate itself from haml element text"""
-
-    self_closing_tags = ('meta', 'img', 'link', 'br', 'hr', 'input', 'source', 'track')
+    self_closing_tags = (
+        'meta', 'img', 'link', 'br', 'hr', 'input', 'source', 'track')
 
     ELEMENT = '%'
     ID = '#'
@@ -42,13 +42,16 @@ class Element(object):
     """, re.X | re.MULTILINE | re.DOTALL | re.UNICODE)
 
     _ATTRIBUTE_KEY_REGEX = r'(?P<key>[a-zA-Z_][a-zA-Z0-9_-]*)'
-    #Single and double quote regexes from: http://stackoverflow.com/a/5453821/281469
+    # Single and double quote regexes from:
+    # http://stackoverflow.com/a/5453821/281469
     _SINGLE_QUOTE_STRING_LITERAL_REGEX = r"'([^'\\]*(?:\\.[^'\\]*)*)'"
     _DOUBLE_QUOTE_STRING_LITERAL_REGEX = r'"([^"\\]*(?:\\.[^"\\]*)*)"'
-    _ATTRIBUTE_VALUE_REGEX = r'(?P<val>\d+|None(?!\w)|%s|%s)' % (_SINGLE_QUOTE_STRING_LITERAL_REGEX, _DOUBLE_QUOTE_STRING_LITERAL_REGEX)
+    _ATTRIBUTE_VALUE_REGEX = r'(?P<val>\d+|None(?!\w)|%s|%s)' % (
+        _SINGLE_QUOTE_STRING_LITERAL_REGEX, _DOUBLE_QUOTE_STRING_LITERAL_REGEX)
 
     RUBY_HAML_REGEX = re.compile(r'(:|\")%s(\"|) =>' % (_ATTRIBUTE_KEY_REGEX))
-    ATTRIBUTE_REGEX = re.compile(r'(?P<pre>\{\s*|,\s*)%s\s*:\s*%s' % (_ATTRIBUTE_KEY_REGEX, _ATTRIBUTE_VALUE_REGEX), re.UNICODE)
+    ATTRIBUTE_REGEX = re.compile(r'(?P<pre>\{\s*|,\s*)%s\s*:\s*%s' % (
+        _ATTRIBUTE_KEY_REGEX, _ATTRIBUTE_VALUE_REGEX), re.UNICODE)
 
     def __init__(self, haml, attr_wrapper="'"):
         self.haml = haml
@@ -69,13 +72,21 @@ class Element(object):
     def _parse_haml(self):
         split_tags = self.HAML_REGEX.search(self.haml).groupdict('')
 
-        self.attributes_dict = self._parse_attribute_dictionary(split_tags.get('attributes'))
+        self.attributes_dict = self._parse_attribute_dictionary(
+            split_tags.get('attributes'))
         self.tag = split_tags.get('tag').strip(self.ELEMENT) or 'div'
         self.id = self._parse_id(split_tags.get('id'))
-        self.classes = ('%s %s' % (split_tags.get('class').lstrip(self.CLASS).replace('.', ' '), self._parse_class_from_attributes_dict())).strip()
-        self.self_close = split_tags.get('selfclose') or self.tag in self.self_closing_tags
-        self.nuke_inner_whitespace = split_tags.get('nuke_inner_whitespace') != ''
-        self.nuke_outer_whitespace = split_tags.get('nuke_outer_whitespace') != ''
+        self.classes = (
+            '%s %s' % (
+                split_tags.get('class').lstrip(self.CLASS).replace('.', ' '),
+                self._parse_class_from_attributes_dict())
+        ).strip()
+        self.self_close = (
+            split_tags.get('selfclose') or self.tag in self.self_closing_tags)
+        self.nuke_inner_whitespace = \
+            split_tags.get('nuke_inner_whitespace') != ''
+        self.nuke_outer_whitespace = \
+            split_tags.get('nuke_outer_whitespace') != ''
         #self.weppy_variable = split_tags.get('django') != ''
         self.inline_content = split_tags.get('inline').strip()
 
@@ -131,9 +142,12 @@ class Element(object):
             try:
                 # converting all allowed attributes to python dictionary style
                 # Replace Ruby-style HAML with Python style
-                attribute_dict_string = re.sub(self.RUBY_HAML_REGEX, '"\g<key>":', attribute_dict_string)
+                attribute_dict_string = re.sub(
+                    self.RUBY_HAML_REGEX, '"\g<key>":', attribute_dict_string)
                 # Put double quotes around key
-                attribute_dict_string = re.sub(self.ATTRIBUTE_REGEX, '\g<pre>"\g<key>":\g<val>', attribute_dict_string)
+                attribute_dict_string = re.sub(
+                    self.ATTRIBUTE_REGEX, '\g<pre>"\g<key>":\g<val>',
+                    attribute_dict_string)
                 # Parse string as dictionary
                 attributes_dict = eval(attribute_dict_string)
                 for k, v in attributes_dict.items():
@@ -141,13 +155,16 @@ class Element(object):
                         if isinstance(v, NoneType):
                             self.attributes += "%s " % (k,)
                         elif isinstance(v, int) or isinstance(v, float):
-                            self.attributes += "%s=%s " % (k, self.attr_wrap(v))
+                            self.attributes += "%s=%s " % (
+                                k, self.attr_wrap(v))
                         else:
                             attributes_dict[k] = v
                             v = to_unicode(v)
-                            self.attributes += "%s=%s " % (k, self.attr_wrap(self._escape_attribute_quotes(v)))
+                            self.attributes += "%s=%s " % (
+                                k, self.attr_wrap(
+                                    self._escape_attribute_quotes(v)))
                 self.attributes = self.attributes.strip()
-            except:
+            except Exception:
                 raise Exception('failed to decode: %s' % attribute_dict_string)
 
         return attributes_dict

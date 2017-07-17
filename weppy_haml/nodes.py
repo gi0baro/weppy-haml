@@ -5,7 +5,7 @@
 
     Processes haml files and creates nodes
 
-    :copyright: (c) 2015 by Giovanni Barillari
+    :copyright: (c) 2017 by Giovanni Barillari
 
     Based on the code of hamlpy (https://github.com/jessemiller/HamlPy)
     :copyright: (c) 2011 Jesse Miller
@@ -53,7 +53,10 @@ def create_node(haml_line):
     if len(stripped_line) == 0:
         return None
 
-    if re.match(INLINE_VARIABLE, stripped_line) or re.match(ESCAPED_INLINE_VARIABLE, stripped_line):
+    if (
+        re.match(INLINE_VARIABLE, stripped_line) or
+        re.match(ESCAPED_INLINE_VARIABLE, stripped_line)
+    ):
         return PlaintextNode(haml_line)
 
     if stripped_line == WEPPY_FILTER:
@@ -136,7 +139,7 @@ class RootNode(TreeNode):
         self.before = ''
         # Rendered text at end of node, e.g. "\n</p>"
         self.after = ''
-        # Indicates that a node does not render anything (for whitespace removal)
+        # Indicates that a node does not render anything
         self.empty_node = False
 
         # Options
@@ -196,8 +199,11 @@ class RootNode(TreeNode):
             self.add_child(node)
 
     def _should_go_inside_last_node(self, node):
-        return len(self.children) > 0 and (node.indentation > self.children[-1].indentation
-            or (node.indentation == self.children[-1].indentation and self.children[-1].should_contain(node)))
+        return (
+            len(self.children) > 0 and (
+                node.indentation > self.children[-1].indentation or (
+                    node.indentation == self.children[-1].indentation and
+                    self.children[-1].should_contain(node))))
 
     def should_contain(self, node):
         return False
@@ -231,7 +237,8 @@ class HamlNode(RootNode):
         return content
 
     def __repr__(self):
-        return '(%s in=%d, nl=%d: %s)' % (self.__class__, self.indentation, self.newlines, self.haml)
+        return '(%s in=%d, nl=%d: %s)' % (
+            self.__class__, self.indentation, self.newlines, self.haml)
 
 
 class PlaintextNode(HamlNode):
@@ -267,11 +274,16 @@ class ElementNode(HamlNode):
         '''Render opening tag and inline content'''
         start = ["%s<%s" % (self.spaces, element.tag)]
         if element.id:
-            start.append(" id=%s" % self.element.attr_wrap(self.replace_inline_variables(element.id)))
+            start.append(
+                " id=%s" % self.element.attr_wrap(
+                    self.replace_inline_variables(element.id)))
         if element.classes:
-            start.append(" class=%s" % self.element.attr_wrap(self.replace_inline_variables(element.classes)))
+            start.append(
+                " class=%s" % self.element.attr_wrap(
+                    self.replace_inline_variables(element.classes)))
         if element.attributes:
-            start.append(' ' + self.replace_inline_variables(element.attributes))
+            start.append(
+                ' ' + self.replace_inline_variables(element.attributes))
 
         content = self._render_inline_content(self.element.inline_content)
 
@@ -307,7 +319,7 @@ class ElementNode(HamlNode):
 
             if self.children:
                 node = self
-                # If node renders nothing, do removal on its first child instead
+                # If node renders nothing, do removal on first child instead
                 if node.children[0].empty_node == True:
                     node = node.children[0]
                 if node.children:
@@ -345,7 +357,7 @@ class ElementNode(HamlNode):
         super(ElementNode, self)._post_render()
 
     def _render_inline_content(self, inline_content):
-        if inline_content == None or len(inline_content) == 0:
+        if inline_content is None or len(inline_content) == 0:
             return None
 
         if self.weppy_variable:
@@ -367,12 +379,13 @@ class CommentNode(HamlNode):
 
 class ConditionalCommentNode(HamlNode):
     def _render(self):
-        conditional = self.haml[1: self.haml.index(']') + 1 ]
+        conditional = self.haml[1: self.haml.index(']') + 1]
 
         if self.children:
             self.before = "<!--%s>\n" % (conditional)
         else:
-            content = self.haml[len(CONDITIONAL_COMMENT) + len(conditional) - 1:]
+            content = self.haml[
+                len(CONDITIONAL_COMMENT) + len(conditional) - 1:]
             self.before = "<!--%s>%s" % (conditional, content)
 
         self.after = "<![endif]-->\n"
@@ -420,7 +433,8 @@ class VariableNode(ElementNode):
 
     def _render(self):
         tag_content = self.haml.lstrip(VARIABLE)
-        self.before = "%s%s" % (self.spaces, self._render_inline_content(tag_content))
+        self.before = "%s%s" % (
+            self.spaces, self._render_inline_content(tag_content))
         self.after = self.render_newlines()
 
     def _post_render(self):
@@ -437,23 +451,27 @@ class TagNode(HamlNode):
         HamlNode.__init__(self, haml)
         self.tag_statement = self.haml.lstrip(TAG).strip()
         self.tag_name = self.tag_statement.split(' ')[0]
-        self.fix_statement = not self.tag_statement.split(' ')[-1].endswith(":")
+        self.fix_statement = (
+            not self.tag_statement.split(' ')[-1].endswith(":"))
 
-        #if (self.tag_name in self.self_closing.values()):
-        #    raise TypeError("Do not close your weppy tags manually.  It will be done for you.")
         if (self.tag_name == self.self_close):
-            raise TypeError("Do not close your Weppy tags manually. It will be done for you.")
+            raise TypeError(
+                "Do not close your Weppy tags manually. "
+                "It will be done for you.")
 
     @property
     def self_close(self):
         return 'pass'
 
     def _render(self):
-        fixture = ':' if self.tag_name in self.need_fixtures and self.fix_statement else ''
+        fixture = (
+            ':' if self.tag_name in self.need_fixtures and self.fix_statement
+            else '')
         self.before = "%s{{%s%s}}" % (self.spaces, self.tag_statement, fixture)
         if (self.tag_name in self.self_closing):
             self.before += self.render_newlines()
-            self.after = '%s{{%s}}%s' % (self.spaces, self.self_close, self.render_newlines())
+            self.after = '%s{{%s}}%s' % (
+                self.spaces, self.self_close, self.render_newlines())
         else:
             if self.children:
                 self.before += self.render_newlines()
@@ -462,7 +480,9 @@ class TagNode(HamlNode):
         self._render_children()
 
     def should_contain(self, node):
-        return isinstance(node, TagNode) and node.tag_name in self.may_contain.get(self.tag_name, '')
+        return (
+            isinstance(node, TagNode) and
+            node.tag_name in self.may_contain.get(self.tag_name, ''))
 
 
 class FilterNode(HamlNode):
@@ -472,7 +492,7 @@ class FilterNode(HamlNode):
     def inside_filter_node(self):
         return True
 
-    def _render_children_as_plain_text(self, remove_indentation = True):
+    def _render_children_as_plain_text(self, remove_indentation=True):
         if self.children:
             initial_indentation = len(self.children[0].spaces)
         for child in self.children:
@@ -485,7 +505,8 @@ class FilterNode(HamlNode):
             child.after = child.render_newlines()
 
     def _post_render(self):
-        # Don't post-render children of filter nodes as we don't want them to be interpreted as HAML
+        # Don't post-render children of filter nodes as we don't want them
+        # to be interpreted as HAML
         pass
 
 
@@ -495,17 +516,19 @@ class PlainFilterNode(FilterNode):
         self.empty_node = True
 
     def _render(self):
-        if self.children:
-            first_indentation = self.children[0].indentation
         self._render_children_as_plain_text()
 
 
 class WeppyFilterNode(FilterNode):
     def _render(self):
         if self.children:
-            self.before = ' '*len(self.spaces)+'{{'+self.render_newlines()[1:]
+            self.before = (
+                ' ' * len(self.spaces) + '{{' + self.render_newlines()[1:])
             indent_offset = len(self.children[0].spaces)
-            code = "\n".join([node.raw_haml[indent_offset:] for node in self.children])+'}}\n'
+            code = (
+                "\n".join(
+                    [node.raw_haml[indent_offset:] for node in self.children]
+                ) + '}}\n')
             self.before += code
         else:
             self.after = self.render_newlines()
