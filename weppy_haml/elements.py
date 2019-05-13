@@ -14,12 +14,8 @@
 """
 
 import re
-from weppy._compat import PY2, to_unicode
 
-if PY2:
-    from types import NoneType
-else:
-    NoneType = type(None)
+from weppy._shortcuts import to_unicode
 
 
 class Element(object):
@@ -152,7 +148,7 @@ class Element(object):
                 attributes_dict = eval(attribute_dict_string)
                 for k, v in attributes_dict.items():
                     if k != 'id' and k != 'class':
-                        if isinstance(v, NoneType):
+                        if v is None:
                             self.attributes += "%s " % (k,)
                         elif isinstance(v, int) or isinstance(v, float):
                             self.attributes += "%s=%s " % (

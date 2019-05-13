@@ -11,7 +11,7 @@ from setuptools import setup
 
 setup(
     name='weppy-Haml',
-    version='0.4',
+    version='0.5dev',
     url='https://github.com/gi0baro/weppy-haml',
     license='BSD',
     author='Giovanni Barillari',
